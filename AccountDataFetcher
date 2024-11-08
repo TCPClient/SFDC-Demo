@@ -1,0 +1,81 @@
+public with sharing class AccountDataFetcher {
+
+    @AuraEnabled(cacheable=true)
+    public static String fetchAccountOpportunitiesWithQuotes(String accountId) {
+        List<AccountWrapper> accountData = new List<AccountWrapper>();
+
+        // Query Opportunities with related Quotes and Quote Line Items for the Account
+        List<Opportunity> oppList = [
+            SELECT Id, Name, StageName, Amount, CloseDate, 
+                (SELECT Id, Name, Status, 
+                    (SELECT Id, Product2Id, Quantity, UnitPrice FROM QuoteLineItems)
+                 FROM Quotes)
+            FROM Opportunity 
+            WHERE AccountId = :accountId AND IsClosed = false
+        ];
+        
+        // Wrap the data
+        for (Opportunity opp : oppList) {
+            AccountWrapper oppWrapper = new AccountWrapper(opp);
+            accountData.add(oppWrapper);
+        }
+        
+        // Convert to JSON and return
+        return JSON.serialize(accountData);
+    }
+
+    // Wrapper Classes
+    public class AccountWrapper {
+        public String opportunityId;
+        public String opportunityName;
+        public String stageName;
+        public Decimal amount;
+        public Date closeDate;
+        public List<QuoteWrapper> quotes;
+
+        public AccountWrapper(Opportunity opp) {
+            this.opportunityId = opp.Id;
+            this.opportunityName = opp.Name;
+            this.stageName = opp.StageName;
+            this.amount = opp.Amount;
+            this.closeDate = opp.CloseDate;
+            this.quotes = new List<QuoteWrapper>();
+            
+            for (Quote quote : opp.Quotes) {
+                this.quotes.add(new QuoteWrapper(quote));
+            }
+        }
+    }
+
+    public class QuoteWrapper {
+        public String quoteId;
+        public String quoteName;
+        public String status;
+        public List<QuoteLineItemWrapper> quoteLineItems;
+
+        public QuoteWrapper(Quote quote) {
+            this.quoteId = quote.Id;
+            this.quoteName = quote.Name;
+            this.status = quote.Status;
+            this.quoteLineItems = new List<QuoteLineItemWrapper>();
+            
+            for (QuoteLineItem qli : quote.QuoteLineItems) {
+                this.quoteLineItems.add(new QuoteLineItemWrapper(qli));
+            }
+        }
+    }
+
+    public class QuoteLineItemWrapper {
+        public String lineItemId;
+        public String productId;
+        public Decimal quantity;
+        public Decimal unitPrice;
+
+        public QuoteLineItemWrapper(QuoteLineItem qli) {
+            this.lineItemId = qli.Id;
+            this.productId = qli.Product2Id;
+            this.quantity = qli.Quantity;
+            this.unitPrice = qli.UnitPrice;
+        }
+    }
+}
