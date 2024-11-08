@@ -1,0 +1,34 @@
+<template>
+    <template if:true={mydata}>
+        <div class="opportunity-quote-display">
+            <template for:each={mydata} for:item="opportunity">
+                <div key={opportunity.opportunityId} class="opportunity-card">
+                    <h3><span class="label">Opportunity:</span> {opportunity.opportunityName}</h3>
+                    <p><span class="label">Stage:</span> {opportunity.stageName}</p>
+                    <p><span class="label">Amount:</span> {opportunity.amount}</p>
+                    <p><span class="label">Close Date:</span> {opportunity.closeDate}</p>
+                    
+                    <h4><span class="label">Quotes:</span></h4>
+                    <template for:each={opportunity.quotes} for:item="quote">
+                        <div key={quote.quoteId} class="quote-card">
+                            <p><span class="label">Quote:</span> {quote.quoteName}</p>
+                            <p><span class="label">Status:</span> {quote.status}</p>
+                            
+                            <h5><span class="label">Quote Line Items:</span></h5>
+                            <template for:each={quote.quoteLineItems} for:item="lineItem">
+                                <div key={lineItem.lineItemId} class="line-item">
+                                    <p><span class="label">Product ID:</span> {lineItem.productId}</p>
+                                    <p><span class="label">Quantity:</span> {lineItem.quantity}</p>
+                                    <p><span class="label">Unit Price:</span> {lineItem.unitPrice}</p>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </template>
+    <template if:false={mydata}>
+        <p>No data available.</p>
+    </template>
+</template>

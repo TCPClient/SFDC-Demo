@@ -1,0 +1,23 @@
+.opportunity-card {
+    border: 1px solid #d3d3d3;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+}
+
+.quote-card {
+    border: 1px dashed #b3b3b3;
+    padding: 8px;
+    margin: 5px 0;
+    background-color: #ffffff;
+}
+
+.line-item {
+    padding-left: 15px;
+    color: #333;
+}
+.label {
+    font-weight: bold;
+	color: #333;
+     /* Customize this color as needed */
+}
